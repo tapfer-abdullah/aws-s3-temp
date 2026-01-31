@@ -34,13 +34,10 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
 
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: app
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Configure SSH
         env:
@@ -59,25 +56,21 @@ jobs:
           # Create deployment directory
           ssh $EC2_USER@$EC2_HOST "mkdir -p ~/app"
 
-          # Copy file to EC2 instance
+          # Copy files to EC2
           rsync -avz \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='.github' \
             . $EC2_USER@$EC2_HOST:~/app/
 
-          # Stop existing pm2 process if exist with same name and start the application with PM2
-          # ssh $EC2_USER@$EC2_HOST "
-          #   cd ~/app &&
-          #   npm install --omit=dev &&
-          #   pm2 delete nodejs-app || true &&
-          #   pm2 start index.js --name nodejs-app
-          # "
-
+          # Install deps and restart app using PATH
           ssh $EC2_USER@$EC2_HOST "
-            source ~/.bashrc &&
+            export NVM_DIR=\"\$HOME/.nvm\" &&
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\" &&
+            export PATH=\$PATH:\$NVM_DIR/versions/node/*/bin &&
             cd ~/app &&
             npm install --omit=dev &&
             pm2 delete nodejs-app || true &&
             pm2 start index.js --name nodejs-app
           "
+
