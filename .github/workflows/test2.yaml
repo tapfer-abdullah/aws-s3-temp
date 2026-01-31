@@ -18,4 +18,15 @@ jobs:
           node -v
           git --version
 
+      - name: Checkout/Copy the run-code
+        uses: actions/checkout@v6
+
+      - name: Set up node environment
+        uses: actions/setup-node@v6
+
+      - name: Verify node & copy code 
+        run: |
+          node -v 
+          ls -a 
+
 #$GITHUB_WORKSPACE -> env variable
