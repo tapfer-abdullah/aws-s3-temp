@@ -1,43 +1,49 @@
 name: Deploy to EC2
 
 on:
-  push:
-    branches: ["main"]
+  push: 
+    branches: 
+      - "main"
+  
   pull_request: 
-    branches: ["main"]
+    branches:
+      - "main"
 
 jobs:
-  build:
+  build: 
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    steps: 
+      - name: Checkout codes
+        uses: actions/checkout@v6
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup node environment (Install nodejs)
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
-          cache: "npm"
+          node-version: 22.12.0
 
       - name: Install dependencies
-        run: npm install
+        run: npm install 
 
-      - name: Build
+      - name: Build codes 
         run: npm run build
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app
-          path: .
 
   deploy:
     runs-on: ubuntu-latest
+    needs: build
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.12.0
+
+      - name: Install dependencies
+        run: npm install 
+
+      - name: Build codes
+        run: npm run build
 
       - name: Configure SSH
         env:
@@ -49,28 +55,27 @@ jobs:
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2
-        env:
+        env: 
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
         run: |
           # Create deployment directory
           ssh $EC2_USER@$EC2_HOST "mkdir -p ~/app"
 
-          # Copy files to EC2
+          # Copy file to EC2 instance
           rsync -avz \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='.github' \
             . $EC2_USER@$EC2_HOST:~/app/
 
-          # Install deps and restart app using PATH
-          ssh $EC2_USER@$EC2_HOST "
-            export NVM_DIR=\"\$HOME/.nvm\" &&
-            [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\" &&
-            export PATH=\$PATH:\$NVM_DIR/versions/node/*/bin &&
-            cd ~/app &&
-            npm install --omit=dev &&
-            pm2 delete nodejs-app || true &&
-            pm2 start index.js --name nodejs-app
-          "
+          # Install production dependencies on EC2
+          ssh $EC2_USER@$EC2_HOST "cd ~/app && export PATH=$PATH:/run/user/1000/fnm_multishells/112424_1734077954807/bin && npm install "
+
+          # Stop existing PM2 process if it exist
+          ssh $EC2_USER@$EC2_HOST "export PATH=$PATH:/run/user/1000/fnm_multishells/112424_1734077954807/bin && pm2 delete nodejs-app || true"
+
+          # Start the application with PM2 
+          ssh $EC2_USER@$EC2_HOST "export PATH=$PATH:/run/user/1000/fnm_multishells/112424_1734077954807/bin && cd ~/app && pm2 start index.js --name nodejs-app"
+          
 
