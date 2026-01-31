@@ -67,7 +67,15 @@ jobs:
             . $EC2_USER@$EC2_HOST:~/app/
 
           # Stop existing pm2 process if exist with same name and start the application with PM2
+          # ssh $EC2_USER@$EC2_HOST "
+          #   cd ~/app &&
+          #   npm install --omit=dev &&
+          #   pm2 delete nodejs-app || true &&
+          #   pm2 start index.js --name nodejs-app
+          # "
+
           ssh $EC2_USER@$EC2_HOST "
+            source ~/.bashrc &&
             cd ~/app &&
             npm install --omit=dev &&
             pm2 delete nodejs-app || true &&
