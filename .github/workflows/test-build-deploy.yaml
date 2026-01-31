@@ -1,0 +1,53 @@
+name: Test Build Deploy Workflow
+
+on: [push, workflow_dispatch]
+
+jobs: 
+  test-code: 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checking codes
+        uses: actions/checkout@v6
+
+      - name: Setup node env
+        uses: actions/setup-node@v6
+        with: 
+          node-version: 22.12.0
+
+      - name: Install dependencies
+        run: npm install --frozen-lockfile
+
+      - name: Test code 
+        run: npm run test
+
+  
+  build-code: #if necessary
+    runs-on: ubuntu-latest
+    needs: test-code #depends on which jobs
+
+    steps:
+      - name: Checking codes
+        uses: actions/checkout@v6
+
+      - name: Setup node env
+        uses: actions/setup-node@v6
+        with: 
+          node-version: 22.12.0
+
+      - name: Install dependencies
+        run: npm install --frozen-lockfile
+
+      - name: Build code 
+        run: echo "Building..." #write command like npm run build
+
+  deploy: 
+    runs-on: ubuntu-latest
+    needs: build-code
+
+    steps:
+      - name: Deploy code
+        run: echo "Write the deploying login here"
+
+
+
