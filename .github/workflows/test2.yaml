@@ -13,7 +13,9 @@ jobs:
           ls -a 
           echo $GITHUB_WORKSPACE
 
-      - name: Checking linting
-        run: echo "Linting checking..."
+      - name: Checking Packages
+        run: |
+          node -v
+          git --version
 
 #$GITHUB_WORKSPACE -> env variable
