@@ -1,0 +1,19 @@
+name: Test Workflow 2
+
+on: [push, workflow_dispatch]
+
+jobs:
+  run-code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print working directory #steps name
+        run: |
+          pwd
+          ls -a 
+          echo $GITHUB_WORKSPACE
+
+      - name: Checking linting
+        run: echo "Linting checking..."
+
+#$GITHUB_WORKSPACE -> env variable
