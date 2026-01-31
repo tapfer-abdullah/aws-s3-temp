@@ -1,6 +1,11 @@
 name: Test Build Deploy Workflow
 
-on: [push, workflow_dispatch]
+# on: [push, workflow_dispatch]
+on: 
+  push:
+    branches:
+      - "main"
+      - "releases/**"
 
 jobs: 
   test-code: 
