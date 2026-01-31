@@ -6,7 +6,8 @@
   "scripts": {
     "test": "vitest --reporter verbose",
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "echo \"No build step defined\""
   },
   "keywords": [],
   "author": "",
