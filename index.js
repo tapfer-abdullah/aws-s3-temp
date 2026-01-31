@@ -17,7 +17,7 @@ const s3 = new AWS.S3Client({
 })
 
 app.get('/', (req, res) => {
-  res.send('Hello World! Ci/Cd')
+  res.send('Hello World!')
 })
 
 app.post('/upload', upload.single('file'), async(req, res) => {
