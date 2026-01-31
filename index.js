@@ -1,11 +1,12 @@
 const express = require('express')
 const app = express()
-const port = 5000
 const fs = require('fs');
 require('dotenv').config();
 
 const multer  = require('multer')
 const upload = multer({ dest: 'uploads/' })
+
+const port = process.env.PORT;
 
 const AWS = require("@aws-sdk/client-s3");
 const s3 = new AWS.S3Client({
@@ -17,7 +18,7 @@ const s3 = new AWS.S3Client({
 })
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.send("Hello you have reached the AKS server")
 })
 
 app.post('/upload', upload.single('file'), async(req, res) => {
