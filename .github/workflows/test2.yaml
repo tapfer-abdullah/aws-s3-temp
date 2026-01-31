@@ -30,5 +30,11 @@ jobs:
         run: |
           node -v 
           ls -a 
+      
+      - name: Install dependencies
+        run: npm install --frozen-lockfile # frozen-lockfile make sure installing the actual package versions
+
+      - name: Test the codes
+        run: npm run test
 
 #$GITHUB_WORKSPACE -> env variable
